@@ -658,22 +658,22 @@ public void ChangeMeasurements(int id)
     }
 
     private void CalculateAverageGoalAndMoneyUsedInPercentage()
+{
+    double budgetAvg = 0;
+    double goalAvg = 0;
+
+    for (int i = 0; i < 4; i++)
     {
-        double budget = 0;
-        double goal = 0;
-
-        for (int i = 0; i < 4; i++)
-        {
-            budget = budget + CalculateBudgetPercentage(i);
-            goal = goal + CalculateBudgetPercentage(i);
-        }
-
-        budget = budget / 4;
-        goal = goal / 4;
-
-        averageGoal.text = string.Format("{0}%", goal.ToString("0")); ;
-       averageMoney.text = string.Format("{0}%", budget.ToString("0"));
+        budgetAvg += CalculateBudgetPercentage(i);
+        goalAvg   += CalculateGoalPercentage(i);   
     }
+
+    budgetAvg /= 4;
+    goalAvg   /= 4;
+
+    averageGoal.text  = $"{goalAvg:0}%";
+    averageMoney.text = $"{budgetAvg:0}%";
+}
 
     //Calulates percentage of budget being used
     private double CalculateBudgetUsed(int partyId)
