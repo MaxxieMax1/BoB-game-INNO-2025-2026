@@ -254,10 +254,11 @@ public class GameManager : MonoBehaviour
         sessionManager.ClearMeasures();
         for (int i = 0; i < parameterMeasurement.Count; i++)
         {
+            // HIER GEBRUIKEN WE NU ParseToDouble I.P.V. Convert.ToDouble
             measureList.Add(new Measure(parameterMeasurement[i].text,
-                Convert.ToDouble(parameterMoney[i].text),
-                Convert.ToDouble(parameterPeopleHelped[i].text),
-                Convert.ToDouble(parameterVolunteers[i].text)));
+                ParseToDouble(parameterMoney[i].text),
+                ParseToDouble(parameterPeopleHelped[i].text),
+                ParseToDouble(parameterVolunteers[i].text)));
             ChangeMeasurements(i);
         }
 
@@ -274,12 +275,14 @@ public class GameManager : MonoBehaviour
         sessionManager.SetMeasures(measureList);
         sessionManager.SetParties(partiesList);
         sessionManager.SetDescription(gameDescription.text);
-        sessionManager.SetBudget(Convert.ToDouble(parameterBudget.text));
-        sessionManager.SetPeopleNeedingHelp(Convert.ToDouble(parameterPeopleNeedingHelp.text));
+        
+        // HIER OOK AANGEPAST
+        sessionManager.SetBudget(ParseToDouble(parameterBudget.text));
+        sessionManager.SetPeopleNeedingHelp(ParseToDouble(parameterPeopleNeedingHelp.text));
 
         // Update Game Values
-        budget = Convert.ToDouble(parameterBudget.text);
-        peopleNeedingHelp = Convert.ToDouble(parameterPeopleNeedingHelp.text);
+        budget = ParseToDouble(parameterBudget.text);
+        peopleNeedingHelp = ParseToDouble(parameterPeopleNeedingHelp.text);
 
         mainmenuDescription.text = gameDescription.text;
 
@@ -289,66 +292,96 @@ public class GameManager : MonoBehaviour
 
     // Saves the values inputted in the settings screen while keeping the sliders
     public void UpdateSettings()
-    {
-        Session session = sessionManager.currentSession;
+{
+    Session session = sessionManager.currentSession;
 
-        List<Measure> measureList = session.measures;
-        List<Party> partiesList = session.parties;
-        String newSessionCode = parameterSessionCode.text;
-        
-        if (measureList.Count != parameterMeasurement.Count)
+    // We maken lokale referenties naar de lijsten
+    List<Measure> measureList = session.measures;
+    List<Party> partiesList = session.parties;
+    string newSessionCode = parameterSessionCode.text;
+
+    // --- STAP 1: MAATREGELEN VEILIG UPDATEN ---
+    for (int i = 0; i < parameterMeasurement.Count; i++)
+    {
+        // Maak de nieuwe data aan (gebruik ParseToDouble als je die hebt, anders Convert.ToDouble)
+        Measure newMeasure = new Measure(
+            parameterMeasurement[i].text,
+            ParseToDouble(parameterMoney[i].text),        // Let op: gebruik je hulpfunctie hier
+            ParseToDouble(parameterPeopleHelped[i].text), // Let op: gebruik je hulpfunctie hier
+            ParseToDouble(parameterVolunteers[i].text)    // Let op: gebruik je hulpfunctie hier
+        );
+
+        // DE FIX: Check of de index bestaat
+        if (i < measureList.Count)
         {
-            for (int i = 0; i < parameterMeasurement.Count; i++)
-            {
-                measureList[i] = new Measure(parameterMeasurement[i].text,
-                    Convert.ToDouble(parameterMoney[i].text),
-                    Convert.ToDouble(parameterPeopleHelped[i].text),
-                    Convert.ToDouble(parameterVolunteers[i].text));
-            }
+            // Hij bestaat, dus we updaten hem
+            measureList[i] = newMeasure;
         }
         else
         {
-            for (int i = 0; i < parameterMeasurement.Count; i++)
-            {
-                measureList[i].MeasureName = parameterMeasurement[i].text;
-                measureList[i].cost = Convert.ToDouble(parameterMoney[i].text);
-                measureList[i].PeopleHelped = Convert.ToDouble(parameterPeopleHelped[i].text);
-                measureList[i].volunteers = Convert.ToDouble(parameterVolunteers[i].text);
- 
-            }
+            // Hij bestaat NIET, dus we voegen hem toe aan het einde
+            measureList.Add(newMeasure);
         }
+    }
 
-        for (int i = 0; i < partyButtons.Count; i++)
+    // --- STAP 2: PARTIJEN VEILIG UPDATEN ---
+    for (int i = 0; i < partyButtons.Count; i++)
+    {
+        Party newParty = new Party(partyNames[i].text, partyDescriptions[i].text);
+
+        // Update de tekst op de knop direct
+        if (partyButtons[i] != null)
         {
-            partiesList[i] = new Party(partyNames[i].text, partyDescriptions[i].text);
             partyButtons[i].GetComponentInChildren<TMP_Text>().text = partyNames[i].text;
         }
 
-        if (session.sessionCode != newSessionCode)
+        // DE FIX: Check of de index bestaat
+        if (i < partiesList.Count)
         {
-            sessionManager.SetNewSessionCode(newSessionCode);
+            // Hij bestaat, dus we updaten hem
+            partiesList[i] = newParty;
         }
-        sessionManager.SetMeasures(measureList);
-        sessionManager.SetParties(partiesList);
-        sessionManager.SetDescription(gameDescription.text);
-        sessionManager.SetBudget(Convert.ToDouble(parameterBudget.text));
-        sessionManager.SetPeopleNeedingHelp(Convert.ToDouble(parameterPeopleNeedingHelp.text));
-
-        // Update Game Values
-        budget = Convert.ToDouble(parameterBudget.text);
-        peopleNeedingHelp = Convert.ToDouble(parameterPeopleNeedingHelp.text);
-
-        mainmenuDescription.text = gameDescription.text;
-
-        sessionManager.UpdateCurrentSession();
-
-        CallInsertToTable();
+        else
+        {
+            // Hij bestaat NIET, dus we voegen hem toe
+            partiesList.Add(newParty);
+        }
     }
 
-    //New meassurement in the game
-    public void ChangeMeasurements(int id)
+    // --- STAP 3: DE REST OPSLAAN ---
+    if (session.sessionCode != newSessionCode)
     {
-        Measure measure = new Measure(parameterMeasurement[id].text, Convert.ToDouble(parameterMoney[id].text), Convert.ToDouble(parameterPeopleHelped[id].text), Convert.ToDouble(parameterVolunteers[id].text));
+        sessionManager.SetNewSessionCode(newSessionCode);
+    }
+
+    // Data terugzetten in de session manager
+    sessionManager.SetMeasures(measureList);
+    sessionManager.SetParties(partiesList);
+    sessionManager.SetDescription(gameDescription.text);
+    
+    // Waardes parsen
+    sessionManager.SetBudget(ParseToDouble(parameterBudget.text));
+    sessionManager.SetPeopleNeedingHelp(ParseToDouble(parameterPeopleNeedingHelp.text));
+
+    // Lokale variabelen updaten
+    budget = ParseToDouble(parameterBudget.text);
+    peopleNeedingHelp = ParseToDouble(parameterPeopleNeedingHelp.text);
+
+    mainmenuDescription.text = gameDescription.text;
+
+    sessionManager.UpdateCurrentSession();
+    CallInsertToTable();
+}
+
+    //New meassurement in the game
+public void ChangeMeasurements(int id)
+    {
+        // ParseToDouble gebruiken
+        Measure measure = new Measure(parameterMeasurement[id].text, 
+            ParseToDouble(parameterMoney[id].text), 
+            ParseToDouble(parameterPeopleHelped[id].text), 
+            ParseToDouble(parameterVolunteers[id].text));
+            
         sessionManager.currentSession.measures.Add(measure);
         meassurement[id].text = sessionManager.currentSession.measures[id].MeasureName;
 
@@ -751,6 +784,23 @@ public class GameManager : MonoBehaviour
             currentPartyId = value;
             ResyncSession();
         }
+    }
+
+    private double ParseToDouble(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return 0;
+
+        // Zorgt dat zowel komma's als punten werken (handig voor NL/EN verschil)
+        string cleanInput = input.Replace(',', '.');
+
+        // Probeert veilig te parsen. Als het lukt: resultaat. Als het faalt: 0.
+        if (double.TryParse(cleanInput, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result))
+        {
+            return result;
+        }
+
+        Debug.LogWarning($"Kon invoer '{input}' niet omzetten naar een getal. Gebruik 0.");
+        return 0;
     }
 
 }

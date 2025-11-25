@@ -5,23 +5,42 @@ using TMPro;
 
 public class ButtonToApi : MonoBehaviour
 {
-    [Header("Average velden")]
+    [Header("Gemiddelde velden")]
     public TMP_Text average1;
     public TMP_Text average2;
     public TMP_Text average3;
     public TMP_Text average4;
     public TMP_Text average5;
 
-    [Header("Endpoint instellingen")]
-    public string setAttributesUrl = "https://engine.tygron.com/api/session/event/editorparametric/set_attributes/?token=214aebafisIjmAq8v6VXHqJEW2n0U8Ds";
-    public string generateUrl = "https://engine.tygron.com/api/session/event/editorparametric/generate/?token=214aebafisIjmAq8v6VXHqJEW2n0U8Ds";
+    [Header("Token invoerveld")]
+    public TMP_InputField apiTokenInput;
+
+    [Header("Endpoint basis URLs (zonder token)")]
+    public string setAttributesBaseUrl = "https://engine.tygron.com/api/session/event/editorparametric/set_attributes/";
+    public string generateBaseUrl = "https://engine.tygron.com/api/session/event/editorparametric/generate/";
+
+    private string apiToken = "";
 
     public void OnSendButtonClick()
     {
-        StartCoroutine(SendAveragesAndGenerate());
+        // Token ophalen uit InputField
+        apiToken = apiTokenInput.text.Trim();
+
+        if (string.IsNullOrEmpty(apiToken))
+        {
+            Debug.LogError("Geen API-token ingevuld!");
+            return;
+        }
+
+        // URLs samenstellen met token
+        string setAttributesUrl = $"{setAttributesBaseUrl}?token={apiToken}";
+        string generateUrl = $"{generateBaseUrl}?token={apiToken}";
+
+        // Start coroutine met samengestelde URLs
+        StartCoroutine(SendAveragesAndGenerate(setAttributesUrl, generateUrl));
     }
 
-    private IEnumerator SendAveragesAndGenerate()
+    private IEnumerator SendAveragesAndGenerate(string setAttributesUrl, string generateUrl)
     {
         // Zet tekstwaarden om naar floats
         float.TryParse(average1.text.Replace(',', '.'), out float val1);
@@ -34,12 +53,12 @@ public class ButtonToApi : MonoBehaviour
         val2 /= 10f;
         val3 /= 10f;
         val4 /= 10f;
-        val5 /= 10f;   
+        val5 /= 10f;
 
         // Bouw de JSON handmatig
         string jsonData = $@"
 [
-  [14, 14, 14, 14, 14],
+  [8, 8, 8, 8, 8],
   [""FRACTION_BUILDINGS"", ""FRACTION_GARDENS"", ""FRACTION_PARKING"", ""FRACTION_PUBLIC_GREEN"", ""FRACTION_ROADS""],
   [[{val1}], [{val2}], [{val3}], [{val4}], [{val5}]]
 ]";
@@ -61,7 +80,7 @@ public class ButtonToApi : MonoBehaviour
                 Debug.Log("Set attributes succesvol: " + www.downloadHandler.text);
 
                 // === Tweede call: generate ===
-                yield return GenerateParametric();
+                yield return GenerateParametric(generateUrl);
             }
             else
             {
@@ -71,10 +90,9 @@ public class ButtonToApi : MonoBehaviour
         }
     }
 
-        private IEnumerator GenerateParametric()
+    private IEnumerator GenerateParametric(string generateUrl)
     {
-        // Bouw JSON body met Parametric Design ID
-        int parametricDesignId = 14; // dit kan je ook dynamisch maken
+        int parametricDesignId =8;
         string jsonData = $"[{parametricDesignId}]";
 
         Debug.Log("Start generate request met JSON: " + jsonData);
