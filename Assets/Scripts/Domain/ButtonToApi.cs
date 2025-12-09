@@ -2,15 +2,21 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
+using System.Text;
 
 public class ButtonToApi : MonoBehaviour
 {
-    [Header("Gemiddelde velden")]
+    [Header("Gemiddelde velden Tygron")]
     public TMP_Text average1;
     public TMP_Text average2;
     public TMP_Text average3;
     public TMP_Text average4;
     public TMP_Text average5;
+
+    [Header("Extra averages voor dashboard")]
+    public TMP_Text draagvlakAverage;  
+    public TMP_Text doelAverage; 
+    public TMP_Text budgetAverage;     
 
     [Header("Token invoerveld")]
     public TMP_InputField apiTokenInput;
@@ -19,11 +25,14 @@ public class ButtonToApi : MonoBehaviour
     public string setAttributesBaseUrl = "https://engine.tygron.com/api/session/event/editorparametric/set_attributes/";
     public string generateBaseUrl = "https://engine.tygron.com/api/session/event/editorparametric/generate/";
 
+    [Header("Dashboard endpoint (VOLLEDIGE URL)")]
+    public string dashboardUrl = "https://httpbin.org/post";
+
     private string apiToken = "";
 
     public void OnSendButtonClick()
     {
-        // Token ophalen uit InputField
+
         apiToken = apiTokenInput.text.Trim();
 
         if (string.IsNullOrEmpty(apiToken))
@@ -32,17 +41,16 @@ public class ButtonToApi : MonoBehaviour
             return;
         }
 
-        // URLs samenstellen met token
         string setAttributesUrl = $"{setAttributesBaseUrl}?token={apiToken}";
         string generateUrl = $"{generateBaseUrl}?token={apiToken}";
 
-        // Start coroutine met samengestelde URLs
         StartCoroutine(SendAveragesAndGenerate(setAttributesUrl, generateUrl));
+
+        StartCoroutine(SendDashboardData());
     }
 
     private IEnumerator SendAveragesAndGenerate(string setAttributesUrl, string generateUrl)
     {
-        // Zet tekstwaarden om naar floats
         float.TryParse(average1.text.Replace(',', '.'), out float val1);
         float.TryParse(average2.text.Replace(',', '.'), out float val2);
         float.TryParse(average3.text.Replace(',', '.'), out float val3);
@@ -55,7 +63,6 @@ public class ButtonToApi : MonoBehaviour
         val4 /= 10f;
         val5 /= 10f;
 
-        // Bouw de JSON handmatig
         string jsonData = $@"
 [
   [8, 8, 8, 8, 8],
@@ -63,12 +70,11 @@ public class ButtonToApi : MonoBehaviour
   [[{val1}], [{val2}], [{val3}], [{val4}], [{val5}]]
 ]";
 
-        Debug.Log("Verzenden JSON:\n" + jsonData);
+        Debug.Log("Verzenden JSON naar Tygron:\n" + jsonData);
 
-        // === Eerste call: set_attributes ===
         using (UnityWebRequest www = new UnityWebRequest(setAttributesUrl, "POST"))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
@@ -79,7 +85,6 @@ public class ButtonToApi : MonoBehaviour
             {
                 Debug.Log("Set attributes succesvol: " + www.downloadHandler.text);
 
-                // === Tweede call: generate ===
                 yield return GenerateParametric(generateUrl);
             }
             else
@@ -92,14 +97,14 @@ public class ButtonToApi : MonoBehaviour
 
     private IEnumerator GenerateParametric(string generateUrl)
     {
-        int parametricDesignId =8;
+        int parametricDesignId = 8;
         string jsonData = $"[{parametricDesignId}]";
 
         Debug.Log("Start generate request met JSON: " + jsonData);
 
         using (UnityWebRequest www = new UnityWebRequest(generateUrl, "POST"))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
@@ -117,4 +122,85 @@ public class ButtonToApi : MonoBehaviour
             }
         }
     }
+
+
+    [System.Serializable]
+    private class DashboardPayload
+    {
+        public float average1;
+        public float average2;
+        public float average3;
+        public float average4;
+        public float average5;
+        public float draagvlakAverage;
+        public float doelAverage;
+        public float budgetAverage;
+    }
+
+    private IEnumerator SendDashboardData()
+{
+    if (string.IsNullOrEmpty(dashboardUrl))
+    {
+        Debug.LogWarning("Geen dashboardUrl ingesteld.");
+        yield break;
+    }
+
+    Debug.Log("=== Start SendDashboardData ===");
+
+    float.TryParse(average1.text.Replace(',', '.'), out float a1);
+    float.TryParse(average2.text.Replace(',', '.'), out float a2);
+    float.TryParse(average3.text.Replace(',', '.'), out float a3);
+    float.TryParse(average4.text.Replace(',', '.'), out float a4);
+    float.TryParse(average5.text.Replace(',', '.'), out float a5);
+
+    float.TryParse(draagvlakAverage.text.Replace("%", "").Replace(',', '.'), out float draagvlak);
+    float.TryParse(doelAverage.text.Replace("%", "").Replace(',', '.'), out float doel);
+    float.TryParse(budgetAverage.text.Replace("%", "").Replace(',', '.'), out float budget);
+
+    Debug.Log($"Dashboard values:");
+    Debug.Log($"Average1: {a1}, Average2: {a2}, Average3: {a3}, Average4: {a4}, Average5: {a5}");
+    Debug.Log($"Draagvlak: {draagvlak}, Doel: {doel}, Budget: {budget}");
+
+    DashboardPayload payload = new DashboardPayload
+    {
+        average1 = a1,
+        average2 = a2,
+        average3 = a3,
+        average4 = a4,
+        average5 = a5,
+        draagvlakAverage = draagvlak,
+        doelAverage = doel,
+        budgetAverage = budget
+    };
+
+    string json = JsonUtility.ToJson(payload, true);
+
+    Debug.Log("JSON dat naar dashboard wordt verstuurd:\n" + json);
+    Debug.Log("Dashboard endpoint URL: " + dashboardUrl);
+
+    using (UnityWebRequest www = new UnityWebRequest(dashboardUrl, "POST"))
+    {
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        Debug.Log("Versturen...");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Dashboard request SUCCESVOL!");
+            Debug.Log("Response:\n" + www.downloadHandler.text);
+        }
+        else
+        {
+            Debug.LogError("Dashboard request MISLUKT: " + www.error);
+            Debug.LogError("Response:\n" + www.downloadHandler.text);
+        }
+
+        Debug.Log("=== Einde SendDashboardData ===");
+    }
+}
 }

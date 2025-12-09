@@ -814,8 +814,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1508208394}
   m_HandleRect: {fileID: 1508208393}
   m_Direction: 0
-  m_Value: -7.9995117
-  m_Size: 0.99891955
+  m_Value: -7.9999695
+  m_Size: 0.9989196
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7533,7 +7533,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1361468777}
   m_Direction: 2
   m_Value: 1.0000002
-  m_Size: 0.75194246
+  m_Size: 0.7519425
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11123,7 +11123,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -40}
+  m_AnchoredPosition: {x: 105.959, y: -40}
   m_SizeDelta: {x: 211.918, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &558284272
@@ -13289,7 +13289,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -40}
+  m_AnchoredPosition: {x: 105.959, y: -40}
   m_SizeDelta: {x: 211.918, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &629427126
@@ -16518,7 +16518,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -40}
+  m_AnchoredPosition: {x: 105.959, y: -40}
   m_SizeDelta: {x: 211.918, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &770155077
@@ -19867,7 +19867,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -25}
+  m_AnchoredPosition: {x: 105.959, y: -25}
   m_SizeDelta: {x: 211.918, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &946444381
@@ -22558,13 +22558,9 @@ MonoBehaviour:
   average3: {fileID: 716077099}
   average4: {fileID: 1449960600}
   average5: {fileID: 1527574787}
-  draagvlakAverage: {fileID: 1989176394}
-  doelAverage: {fileID: 866278661}
-  budgetAverage: {fileID: 873509316}
   apiTokenInput: {fileID: 1036300307}
   setAttributesBaseUrl: https://engine.tygron.com/api/session/event/editorparametric/set_attributes/
   generateBaseUrl: https://engine.tygron.com/api/session/event/editorparametric/generate/
-  dashboardUrl: https://httpbin.org/post
 --- !u!1 &1139552248
 GameObject:
   m_ObjectHideFlags: 0
@@ -27696,7 +27692,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -25}
+  m_AnchoredPosition: {x: 105.959, y: -25}
   m_SizeDelta: {x: 211.918, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1462735365
@@ -28855,7 +28851,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -40}
+  m_AnchoredPosition: {x: 105.959, y: -40}
   m_SizeDelta: {x: 211.918, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1534316554
@@ -38182,7 +38178,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -25}
+  m_AnchoredPosition: {x: 105.959, y: -25}
   m_SizeDelta: {x: 211.918, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1989176394
@@ -38318,7 +38314,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 105.958984, y: -25}
+  m_AnchoredPosition: {x: 105.959, y: -25}
   m_SizeDelta: {x: 211.918, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1993449771
@@ -42624,7 +42620,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4143841788811536415, guid: e4e4da4849c4bbe4eb0906aa0b680565, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 105.958984
+      value: 105.959
       objectReference: {fileID: 0}
     - target: {fileID: 4143841788811536415, guid: e4e4da4849c4bbe4eb0906aa0b680565, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -43033,6 +43029,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 664691167}
+  - {fileID: 1803176578}
   - {fileID: 1836725758}
   - {fileID: 57336302}
   - {fileID: 1836565661}
@@ -43040,7 +43037,6 @@ SceneRoots:
   - {fileID: 3862523}
   - {fileID: 1529734517}
   - {fileID: 1782558286}
-  - {fileID: 1803176578}
   - {fileID: 251069129}
   - {fileID: 2122629999}
   - {fileID: 218928659}
